@@ -1,0 +1,61 @@
+{% extends "linear_regression/base.html" %}
+{% load static %}
+
+{% block demo %}
+<!-- Reset Form -->
+
+<span class="img-container"> <!-- Inline parent element -->
+	<img src="https://commotionwireless.net/files/CCK_Networking_Basics_intro_graphic.png"
+	alt="" width="200vw" height="200vh"
+	style="top: 100px; left: 10px;">
+  </span>
+
+<div class="container text-center" style="padding-top: 1vh;">
+
+	<div class="desc_p">
+
+	<p>
+		You should upload a single csv file containing the edge list of your network.
+		The default is an undirected graph, so if you provide an edge {node1, node2} we assume node1 and node2 are mutually reachable from each other.
+		
+		<table>
+			<tr>
+			    <th>node1_id	&nbsp;&nbsp;</th>
+			    <th>node2_id	&nbsp;&nbsp;</th>
+			</tr>
+
+			<tr>
+			    <td>0</td>
+			    <td>1</td>
+			</tr>
+
+			<tr>
+				<td>0</td>
+			    <td>2</td>
+			</tr>
+
+		  </table>
+
+	</p>
+	</div>
+</div>
+
+
+<div class="container text-center" style="padding-top: 20px;">
+		{% csrf_token %}
+		<form method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<button type="submit">Upload</button>
+		  </form>
+</div>
+
+<!-- Download Status -->
+<div class="container" style="padding-top: 20px;">
+	<div class="card" style="height: 120px;">
+		{% block progress %}{% endblock progress %}
+	</div>
+</div>
+
+{% endblock %}
+

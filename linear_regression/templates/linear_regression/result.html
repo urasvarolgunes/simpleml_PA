@@ -1,0 +1,44 @@
+{% extends 'linear_regression/index.html' %}
+
+{% block show_network %}
+
+
+
+<div class="text-center">
+
+    <div class="container mb-10">
+    {% autoescape off %}
+        {{ plot_div }}
+    {% endautoescape %}
+
+    <div class="card" style="width: 15vw; font-family: 'Source Sans Pro', sans-serif;">
+        <div class="card-header" style="background-color: #141518; color: white;">
+          Accuracy
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item" style="background-color: #707b9e; color: white;"> Training: 95% </li>
+          <li class="list-group-item" style="background-color: #707b9e; color: white;">Validation: 95%</li>
+          <li class="list-group-item" style="background-color: #707b9e; color: white;">Testing: 95%</li>
+        </ul>
+
+        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+            Results by class
+        </button>
+    
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+            Results by class here.
+            </div>
+        </div>
+
+      </div>
+
+    </div>
+
+</div>
+
+
+
+</body>
+{% endblock %}
+
