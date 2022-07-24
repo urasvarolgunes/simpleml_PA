@@ -1,3 +1,4 @@
+http://download.pytorch.org/whl/cpu/torch-0.4.1-cp36-cp36m-linux_x86_64.whl
 amqp==2.6.1
 async-timeout==4.0.2
 billiard==3.6.4.0
