@@ -21,5 +21,4 @@ urlpatterns = [
     path('linear_regression/', include('linear_regression.urls')),
     path('GCN/', include('GCN.urls')),
     path('admin/', admin.site.urls),
-    path('celery-progress/', include('celery_progress.urls')),
 ]

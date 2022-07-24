@@ -33,8 +33,6 @@ ALLOWED_HOSTS = ['simple-ml-solutions.herokuapp.com', 'localhost', '127.0.0.1', 
 # Application definition
 
 INSTALLED_APPS = [
-    'celery',
-	'celery_progress',
     'GCN',
     'landing',
     'linear_regression',
@@ -128,9 +126,6 @@ DEPLOYING_HEROKU = False
 
 if not DEPLOYING_HEROKU:
     STATIC_URL = '/static/'
-    # Celery Settings
-    CELERY_BROKER_URL = 'redis://localhost:6379'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 else:
     STATIC_URL = os.path.join(BASE_DIR, 'static') #changed when deploying to heroku
     STATIC_ROOT = os.path.join(BASE_DIR, 'static') #changed when deploying to heroku
