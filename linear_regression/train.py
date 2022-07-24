@@ -39,6 +39,8 @@ def train(epoch, model, optimizer, features, labels, adj, idx_train, idx_val):
           'time: {:.4f}s'.format(time.time() - t))
     '''
 
+    return acc_train.item(), acc_val.item()
+
 def test(model, features, labels, adj, idx_test):
     model.eval()
     output = model(features, adj)
@@ -47,3 +49,5 @@ def test(model, features, labels, adj, idx_test):
     print("Test set results:",
           "loss= {:.4f}".format(loss_test.item()),
           "accuracy= {:.4f}".format(acc_test.item()))
+
+    return acc_test.item()

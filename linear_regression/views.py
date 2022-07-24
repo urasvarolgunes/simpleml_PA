@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import View
-#from sklearn.preprocessing import label_binarize
 from .forms import UploadFileForm
 from .models import MyModel, EdgeData
 import pandas as pd
@@ -15,15 +14,19 @@ class upload_file(View):
     def get(self, request, *args, **kwargs):
         EdgeData.objects.all().delete()
         form = UploadFileForm()
-        return render(request, 'linear_regression/progress.html', {'form': form})
+        return render(request, 'linear_regression/download.html', {'form': form})
     
     def post(self, request, *args, **kwargs):
-
-        file = request.FILES['file'].read().decode('utf-8')
+            
+        try:
+            file = request.FILES['file'].read().decode('utf-8')
+        except:
+            return render(request, 'linear_regression/no_file.html')
+            
         node_to_label_dict, node_to_feature_dict, label_to_id_dict = read_data(file)
-        task = build_model.delay(file, node_to_label_dict, node_to_feature_dict, label_to_id_dict)   
-
-        return render(request, 'linear_regression/progress.html', {'task_id': task.task_id})
+        train_acc, val_acc, test_acc = build_model(file, node_to_label_dict, node_to_feature_dict, label_to_id_dict)   
+        print(train_acc, val_acc, test_acc)
+        return render(request, 'linear_regression/download.html', {'result_ready': True, 'train_acc': train_acc, 'val_acc': val_acc, 'test_acc': test_acc})
 
 
 class result_view(View):
@@ -32,9 +35,12 @@ class result_view(View):
         fig = graph_function()
         gantt_plot = plot(fig, output_type="div")
 
-        return render(request, 'linear_regression/result.html', {'plot_div': gantt_plot})
-
-
+        train_acc, val_acc, test_acc = list(map(float, request.GET.get('acc_list').split(' ')))
+        print(train_acc, test_acc, val_acc)
+        return render(request, 'linear_regression/result.html', {'plot_div': gantt_plot,
+                                                                'train_acc': train_acc*100,
+                                                                'val_acc': val_acc*100,
+                                                                'test_acc': test_acc*100})
 
 def read_data(file):
     csv_data = csv.reader(StringIO(file), delimiter=',')

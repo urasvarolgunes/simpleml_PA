@@ -1,9 +1,3 @@
-# Celery
-#from asyncore import file_dispatcher
-from celery import shared_task
-# Celery-progress
-from celery_progress.backend import ProgressRecorder
-# Task imports
 import time
 from linear_regression.models import MyModel, EdgeData
 from simple_ml.settings import MEDIA_ROOT, MEDIA_URL
@@ -17,31 +11,33 @@ import numpy as np
 import torch
 import csv
 from io import StringIO
-from django.db import transaction
+import scipy.sparse as sp
 
-# Celery Task
-@shared_task(bind=True)
-def build_model(self, file, node_to_label_dict, node_to_feature_dict, label_to_id_dict):
-    
-    epochs = 500
-    progress_recorder = ProgressRecorder(self)
-    progress_recorder.set_progress(0, epochs, description="Training Model...")
+def build_model(file, node_to_label_dict, node_to_feature_dict, label_to_id_dict):
+
+    n_nodes = len(node_to_label_dict)
+    epochs = 1000
     print(node_to_label_dict)
-    node_to_nodeid = {int(node):i for i,node in enumerate(node_to_label_dict.keys())}
+    node_to_nodeid = {node:i for i,node in enumerate(node_to_label_dict.keys())}
     print(node_to_nodeid)
-    nodeid_to_node = {i:int(node) for i,node in enumerate(node_to_label_dict.keys())}
+    nodeid_to_node = {i:node for i,node in enumerate(node_to_label_dict.keys())}
     print(nodeid_to_node)    
     edge_list = EdgeData.objects.all()
-    edge_list = [(node_to_nodeid[edge.node1_id], node_to_nodeid[edge.node2_id]) for edge in edge_list]
-    #edge_list = [(node_to_nodeid[node1], node_to_nodeid[node2]) for node1, node2 in edge_list]
-    n_nodes = len(node_to_label_dict)
-    indices = torch.LongTensor(edge_list).T #need to transpose as sparse matrix expects shape [2, n_edges]
-    values = torch.ones(indices.shape[1]).float()
 
-    adj = torch.sparse.FloatTensor(indices, values, size=torch.Size([n_nodes, n_nodes]))
-    features = torch.FloatTensor([node_to_feature_dict[str(nodeid_to_node[node_id])] for node_id in range(n_nodes)])
-    labels = torch.LongTensor([node_to_label_dict[str(nodeid_to_node[node_id])] for node_id in range(n_nodes)])
+    features = torch.FloatTensor([node_to_feature_dict[nodeid_to_node[node_id]] for node_id in range(n_nodes)])
+    features = torch.nn.functional.normalize(features, p=1, dim=0)
+    labels = torch.LongTensor([node_to_label_dict[nodeid_to_node[node_id]] for node_id in range(n_nodes)])
 
+    edges = np.array([(node_to_nodeid[edge.node1_id], node_to_nodeid[edge.node2_id]) for edge in edge_list])
+    
+    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
+                        shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
+
+    # build symmetric adjacency matrix
+    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+    adj = normalize(adj + sp.eye(adj.shape[0]))
+    adj = sparse_mx_to_torch_sparse_tensor(adj)
+    
     idx_train = range(int(n_nodes*0.8))
     idx_val = range(int(n_nodes*0.8), int(n_nodes*0.9))
     idx_test = range(int(n_nodes*0.9), n_nodes)
@@ -52,7 +48,7 @@ def build_model(self, file, node_to_label_dict, node_to_feature_dict, label_to_i
 
     # Model and optimizer
     model = GCN(nfeat=features.shape[1],
-                nhid=32,
+                nhid=64,
                 nclass=labels.max().item() + 1,
                 dropout=0.0)
 
@@ -60,16 +56,31 @@ def build_model(self, file, node_to_label_dict, node_to_feature_dict, label_to_i
 
     t_total = time.time()
     for epoch in range(epochs):
-        train(epoch, model, optimizer, features, labels, adj, idx_train, idx_val)
-        progress_recorder.set_progress(epoch + 1, epochs, description="Training Model...")
+        train_acc, val_acc = train(epoch, model, optimizer, features, labels, adj, idx_train, idx_val)
 
     print("Optimization Finished!")
     print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
 
     print('testing')
-    test(model, features, labels, adj, idx_test)
+    test_acc = test(model, features, labels, adj, idx_test)
     
-    #progress_recorder = ProgressRecorder(self)
-    #progress_recorder.set_progress(1, 10, description="Training Model...")
+    return train_acc, val_acc, test_acc
 
-    return 'Finished.'
+
+def sparse_mx_to_torch_sparse_tensor(sparse_mx):
+    """Convert a scipy sparse matrix to a torch sparse tensor."""
+    sparse_mx = sparse_mx.tocoo().astype(np.float32)
+    indices = torch.from_numpy(
+        np.vstack((sparse_mx.row, sparse_mx.col)).astype(np.int64))
+    values = torch.from_numpy(sparse_mx.data)
+    shape = torch.Size(sparse_mx.shape)
+    return torch.sparse.FloatTensor(indices, values, shape)
+
+def normalize(mx):
+    """Row-normalize sparse matrix"""
+    rowsum = np.array(mx.sum(1))
+    r_inv = np.power(rowsum, -1).flatten()
+    r_inv[np.isinf(r_inv)] = 0.
+    r_mat_inv = sp.diags(r_inv)
+    mx = r_mat_inv.dot(mx)
+    return mx

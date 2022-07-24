@@ -16,9 +16,9 @@
           Accuracy
         </div>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item" style="background-color: #707b9e; color: white;"> Training: 95% </li>
-          <li class="list-group-item" style="background-color: #707b9e; color: white;">Validation: 95%</li>
-          <li class="list-group-item" style="background-color: #707b9e; color: white;">Testing: 95%</li>
+          <li class="list-group-item" style="background-color: #707b9e; color: white;"> Training: {{train_acc | floatformat:2}}% </li>
+          <li class="list-group-item" style="background-color: #707b9e; color: white;">Validation: {{val_acc | floatformat:2}}%</li>
+          <li class="list-group-item" style="background-color: #707b9e; color: white;">Testing: {{test_acc | floatformat:2}}%</li>
         </ul>
 
         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">

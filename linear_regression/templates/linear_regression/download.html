@@ -42,20 +42,83 @@
 
 
 <div class="container text-center" style="padding-top: 20px;">
+
+		{% if form %}
+
 		{% csrf_token %}
-		<form method="post" enctype="multipart/form-data">
+		<form method="post" enctype="multipart/form-data" id="form">
 			{% csrf_token %}
 			{{ form.as_p }}
-			<button type="submit">Upload</button>
+			<button type="submit" id="upload_button">
+				Upload
+			</button>
 		  </form>
+		
+		{% endif %}
+
+		<style>
+			.save-btn{
+				font-size:22px;
+				color:#fff;
+				background:rgb(29, 20, 20);
+				width:auto;
+				height: auto;
+				cursor: pointer;
+				border-radius: 3px;
+			}
+
+			.loader{
+				pointer-events: none;
+				width: 30px;
+				height: 30px;
+				border-radius: 50%;
+				border: 3px solid transparent;
+				border-top-color:bisque;
+				animation: an1 1s ease infinite;
+			}
+
+			@keyframes an1{
+				0% {
+					transform: rotate(0turn);
+				}
+				100% {
+					transform: rotate(1turn);
+				}
+			}
+
+		</style>
+
+		<br>
+		<button class="save-btn" id="save_button" style="display:none;"></button>
+		<br>
+		<p id="loading_text" style="display:none;"> Loading.. May take a few minutes.. </p>
+
+		<script>
+			save_btn = document.getElementById("save_button");
+			upload_btn = document.getElementById("upload_button");
+			loading_text = document.getElementById("loading_text");
+			form = document.getElementById("form");
+
+			upload_btn.onclick = function(){
+				save_btn.style.display = "inline";
+				loading_text.style.display = "inline";
+				save_btn.innerHTML = "<div class='loader'></div>"
+				form.style.display = "none";
+			}
+
+		</script>
+
+		{% if result_ready %}
+		<button type="submit" style="background-color: rgb(29, 20, 20)">
+			<a href="{% url 'linear_regression:result' %}?acc_list={{train_acc}} {{val_acc}} {{test_acc}}" style="color:#fff;"> Get Results </a>
+		</button>
+		{% endif %}
+
+		{% block no_file %}
+		{% endblock %}
 </div>
 
-<!-- Download Status -->
-<div class="container" style="padding-top: 20px;">
-	<div class="card" style="height: 120px;">
-		{% block progress %}{% endblock progress %}
-	</div>
-</div>
 
 {% endblock %}
+
 
