@@ -4,6 +4,7 @@ from __future__ import print_function
 import time
 import argparse
 import numpy as np
+#from sklearn.model_selection import learning_curve
 
 import torch
 import torch.nn.functional as F
@@ -18,36 +19,50 @@ torch.manual_seed(0)
 #adj, features, labels, idx_train, idx_val, idx_test = load_data()
 
 def train(epoch, model, optimizer, features, labels, adj, idx_train, idx_val):
-    t = time.time()
-    model.train()
-    optimizer.zero_grad()
-    output = model(features, adj)
-    loss_train = F.nll_loss(output[idx_train], labels[idx_train])
-    acc_train = accuracy(output[idx_train], labels[idx_train])
-    loss_train.backward()
-    optimizer.step()
+      t = time.time()
+      model.train()
+      optimizer.zero_grad()
+      output = model(features, adj)
+      loss_train = F.nll_loss(output[idx_train], labels[idx_train])
+      acc_train = accuracy(output[idx_train], labels[idx_train])
+      loss_train.backward()
+      optimizer.step()
 
-    loss_val = F.nll_loss(output[idx_val], labels[idx_val])
-    acc_val = accuracy(output[idx_val], labels[idx_val])
+      loss_val = F.nll_loss(output[idx_val], labels[idx_val])
+      acc_val = accuracy(output[idx_val], labels[idx_val])
 
-    '''
-    print('Epoch: {:04d}'.format(epoch+1),
-          'loss_train: {:.4f}'.format(loss_train.item()),
-          'acc_train: {:.4f}'.format(acc_train.item()),
-          'loss_val: {:.4f}'.format(loss_val.item()),
-          'acc_val: {:.4f}'.format(acc_val.item()),
-          'time: {:.4f}s'.format(time.time() - t))
-    '''
+      '''
+      print('Epoch: {:04d}'.format(epoch+1),
+            'loss_train: {:.4f}'.format(loss_train.item()),
+            'acc_train: {:.4f}'.format(acc_train.item()),
+            'loss_val: {:.4f}'.format(loss_val.item()),
+            'acc_val: {:.4f}'.format(acc_val.item()),
+            'time: {:.4f}s'.format(time.time() - t))
+      '''
 
-    return acc_train.item(), acc_val.item()
+      return acc_train.item(), acc_val.item()
 
 def test(model, features, labels, adj, idx_test):
-    model.eval()
-    output = model(features, adj)
-    loss_test = F.nll_loss(output[idx_test], labels[idx_test])
-    acc_test = accuracy(output[idx_test], labels[idx_test])
-    print("Test set results:",
-          "loss= {:.4f}".format(loss_test.item()),
-          "accuracy= {:.4f}".format(acc_test.item()))
+      model.eval()
+      output = model(features, adj)
+      loss_test = F.nll_loss(output[idx_test], labels[idx_test])
+      acc_test = accuracy(output[idx_test], labels[idx_test])
+      print("Test set results:",
+            "loss= {:.4f}".format(loss_test.item()),
+            "accuracy= {:.4f}".format(acc_test.item()))
+      
 
-    return acc_test.item()
+      label_res_dict = dict()
+      preds = output.max(1)[1]      
+
+      for label, pred in zip(labels[idx_test], preds[idx_test]):
+            if label.item() not in label_res_dict:
+                  label_res_dict[label.item()] = [0,0] #[correct_cnt, total_cnt]
+            
+            label_res_dict[label.item()][1] += 1
+
+            if label == pred:
+                  label_res_dict[label.item()][0] += 1
+      
+      print(label_res_dict)
+      return acc_test.item(), label_res_dict

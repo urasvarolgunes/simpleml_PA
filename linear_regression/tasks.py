@@ -16,12 +16,9 @@ import scipy.sparse as sp
 def build_model(file, node_to_label_dict, node_to_feature_dict, label_to_id_dict):
 
     n_nodes = len(node_to_label_dict)
-    epochs = 1000
-    print(node_to_label_dict)
+    epochs = 500
     node_to_nodeid = {node:i for i,node in enumerate(node_to_label_dict.keys())}
-    print(node_to_nodeid)
     nodeid_to_node = {i:node for i,node in enumerate(node_to_label_dict.keys())}
-    print(nodeid_to_node)    
     edge_list = EdgeData.objects.all()
 
     features = torch.FloatTensor([node_to_feature_dict[nodeid_to_node[node_id]] for node_id in range(n_nodes)])
@@ -37,10 +34,12 @@ def build_model(file, node_to_label_dict, node_to_feature_dict, label_to_id_dict
     adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
     adj = normalize(adj + sp.eye(adj.shape[0]))
     adj = sparse_mx_to_torch_sparse_tensor(adj)
-    
-    idx_train = range(int(n_nodes*0.8))
-    idx_val = range(int(n_nodes*0.8), int(n_nodes*0.9))
-    idx_test = range(int(n_nodes*0.9), n_nodes)
+
+    perm = torch.randperm(n_nodes)
+
+    idx_train = perm[0:int(n_nodes*0.8)]
+    idx_val = perm[int(n_nodes*0.8):int(n_nodes*0.9)]
+    idx_test = perm[int(n_nodes*0.9):n_nodes]
 
     idx_train = torch.LongTensor(idx_train)
     idx_val = torch.LongTensor(idx_val)
@@ -62,9 +61,11 @@ def build_model(file, node_to_label_dict, node_to_feature_dict, label_to_id_dict
     print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
 
     print('testing')
-    test_acc = test(model, features, labels, adj, idx_test)
+    test_acc, label_res_dict = test(model, features, labels, adj, idx_test)
     
-    return train_acc, val_acc, test_acc
+    counts = [len(idx_train), len(idx_val), len(idx_test)]
+
+    return train_acc, val_acc, test_acc, label_res_dict, counts
 
 
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
