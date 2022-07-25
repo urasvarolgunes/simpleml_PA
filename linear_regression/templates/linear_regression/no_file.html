@@ -1,10 +1,12 @@
-{% extends 'linear_regression/download.html' %}
+{% extends 'linear_regression/index.html' %}
+
 
 {% block no_file %}
+<div class="container text-center">
     <div class="desc_p">
         <h5> No file was selected for upload! Please go back or click the button to try again!
 
-            <button type="submit" style="background-color: rgb(29, 20, 20)">
+            <button type="button" class="btn btn-primary btn-lg">
                 <a href="{% url 'linear_regression:demo' %}" style="color:#fff;"> Try Again </a>
             </button>
 
@@ -13,6 +15,7 @@
              If you selected a file, than it is possible that your file type or input format is incorrect.
         </h5>
     </div>
+</div>
     
 
 {% endblock %}

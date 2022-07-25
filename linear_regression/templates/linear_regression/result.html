@@ -2,65 +2,61 @@
 
 {% block show_network %}
 
+<div class="text-center" style="font-size:2vh">
+  
+  <div class="p-5 text-center bg-image" style="height: 12vh;">
+    <div class="mask" style="background-color: rgba(14, 5, 5, 0.6);">
+      <div class="d-flex justify-content-center align-items-center">
+        <div class="text-white">
+          <h1 class="mb-0">Results</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-
-<div class="text-center">
-
-    <div class="container mb-10">
+  <div class="container mb-10">
     {% autoescape off %}
         {{ plot_div }}
     {% endautoescape %}
 
-    <div class="card" style="width: 15vw; font-family: 'Source Sans Pro', sans-serif;">
-        <div class="card-header" style="background-color: #141518; color: white;">
-          Accuracy
-        </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item" style="background-color: #707b9e; color: white;"> Training ({{train_cnt}}): {{train_acc | floatformat:2}}% </li>
-          <li class="list-group-item" style="background-color: #707b9e; color: white;">Validation ({{val_cnt}}): {{val_acc | floatformat:2}}%</li>
-          <li class="list-group-item" style="background-color: #707b9e; color: white;">Testing ({{test_cnt}}): {{test_acc | floatformat:2}}% </li>
-        </ul>
-
-
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#test_result"
-                        aria-expanded="false" aria-controls="test_result" style="position:absolute; right:-20vw; height:5vh; width:15vw;"
-                        style="background-color: #141518; color: white;">
-          Test Results by Labels
-        </button>
     
-        <div class="collapse" id="test_result" style="position:absolute; right:-20vw; top:5vh">
-              <div class="card" style="width: 15vw; font-family: 'Source Sans Pro', sans-serif;">
-                <ul class="list-group list-group-flush">
-                  {% for key, value in test_result.items %} 
-                  <li class="list-group-item" style="background-color: #707b9e; color: white;"> Label {{key}}: {{value.0}}/{{value.1}} correct</li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
-
-
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#label_freq"
-                        aria-expanded="false" aria-controls="label_freq" style="position:absolute; right:-40vw; height:5vh; width:15vw;"
-                        style="background-color: #141518; color: white;">
-          Label Frequencies (Full Dataset)
-        </button>
-    
-        <div class="collapse" id="label_freq" style="position:absolute; right:-40vw; top:5vh">
-              <div class="card" style="width: 15vw; font-family: 'Source Sans Pro', sans-serif;">
-                <ul class="list-group list-group-flush">
-                  {% for key, value in label_dist.items %} 
-                  <li class="list-group-item" style="background-color: #707b9e; color: white;"> Label {{key}} Count: {{value}}</li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
-
+    <div class="card">
+      <div class="card-header" style="background-color:#21242c; color:white;">
+        Accuracy
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" style="background-color: #707b9e; color: white;"> Training ({{train_cnt}}): {{train_acc | floatformat:2}}% </li>
+        <li class="list-group-item" style="background-color: #707b9e; color: white;">Validation ({{val_cnt}}): {{val_acc | floatformat:2}}%</li>
+        <li class="list-group-item" style="background-color: #707b9e; color: white;">Testing ({{test_cnt}}): {{test_acc | floatformat:2}}% </li>
+      </ul>
     </div>
 
+  
+    <div class="card">
+      <div class="card-header" style="background-color:#21242c; color:white;">
+        Test Result By Labels
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for key, value in test_result.items %} 
+        <li class="list-group-item" style="background-color: #707b9e; color: white;"> Label {{key}}: {{value.0}}/{{value.1}} correct</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header" style="background-color:#21242c; color:white;">
+        Label Frequencies (Full Dataset)
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for key, value in label_dist.items %} 
+        <li class="list-group-item" style="background-color: #707b9e; color: white;"> Label {{key}} Count: {{value}}</li>
+      {% endfor %}
+      </ul>
+    </div>
+    
+  </div>
 </div>
 
-
-
-</body>
 {% endblock %}
 

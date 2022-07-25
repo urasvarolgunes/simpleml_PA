@@ -130,7 +130,7 @@ def graph_function():
 
     edge_trace = go.Scatter(
         x=edge_x, y=edge_y,
-        line=dict(width=0.5, color='#888'),
+        line=dict(width=0.1, color='#888'),
         hoverinfo='none',
         mode='lines')
 

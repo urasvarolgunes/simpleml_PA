@@ -62,7 +62,7 @@
     
       <!-- Background image -->
       <div
-        class="p-5 text-center bg-image"
+        class="p-5 text-left bg-image"
         style="
           height: 400px;
         "
@@ -75,11 +75,22 @@
               <h5>
                 Graph Neural Networks (GNN) are a class of deep learning methods designed to perform inference on data described by graphs.
                 GNNs can be directly applied to graphs, and provide an easy way to do node-level, edge-level, and graph-level prediction tasks.
-                This API allows the user to build a specific variant of GNNs called graph convolutional network (GCNs) to solve node classification
-                tasks by simply uploading their data. Result metrics and a summary of the data is provided at the end.
+                This API allows the user to build a specific variant of GNNs called graph convolutional network (GCNs) [1] to solve node classification
+                tasks by simply formatting and uploading their data. Result metrics and a summary of the data is provided at the end. Currently,
+                the intention is to get a feel for the potential performance of the model rather than getting the most optimized version. However, that is the
+                one of the future directions of the project.
+                <br><br>
+                It takes a few minutes to build a model for a dataset 3000 nodes and 6000 edges. The API can currently handle datasets with a size of 5-10 MB.
+                Keep in mind that it has not been tested for very large datasets and the resources may be not be sufficient for such analysis.
+                
+                <br><br>
+                <a href="https://arxiv.org/abs/1609.02907">  
+                  [1] Kipf & Welling, Semi-Supervised Classification with Graph Convolutional Networks, 2016 </a>
                 <br>
                 <br>
                 Developed by Uras Varolgunes
+                <br>
+                email: urasvarolgunes@gmail.com
               </h5>
 
             </div>

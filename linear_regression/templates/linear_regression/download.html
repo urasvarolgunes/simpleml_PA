@@ -1,13 +1,27 @@
-{% extends "linear_regression/base.html" %}
+{% extends "linear_regression/index.html" %}
 {% load static %}
 
-{% block demo %}
+{% block explanation %}
 <!-- Reset Form -->
 
+<div
+class="p-5 text-center bg-image"
+style="height: 12vh;">
+
+<div class="mask" style="background-color: rgba(14, 5, 5, 0.6);">
+  <div class="d-flex justify-content-center align-items-center">
+	<div class="text-white">
+	  <h1 class="mb-0">Graph Neural Network</h1>
+	  </div>
+	</div>
+  </div>
+</div>
+</div>
+
+{% if form %}
 <span class="img-container"> <!-- Inline parent element -->
 	<img src="https://commotionwireless.net/files/CCK_Networking_Basics_intro_graphic.png"
-	alt="" width="200vw" height="200vh"
-	style="top: 100px; left: 10px;">
+	alt="" width="200vw" height="200vh" > <!--style="top: 100px; left: 10px;"-->
   </span>
 
 <div class="container text-center" style="padding-top: 1vh;">
@@ -51,6 +65,7 @@
 	</div>
 </div>
 
+{% endif %}
 
 <div class="container text-center" style="padding-top: 20px;">
 
@@ -60,7 +75,7 @@
 		<form method="post" enctype="multipart/form-data" id="form">
 			{% csrf_token %}
 			{{ form.as_p }}
-			<button type="submit" id="upload_button">
+			<button type="submit" id="upload_button" class="btn btn-primary btn-lg">
 				Upload
 			</button>
 		  </form>
@@ -120,16 +135,14 @@
 		</script>
 
 		{% if result_ready %}
-		<button type="submit" style="background-color: rgb(29, 20, 20)">
+		<button type="button" class="btn btn-primary btn-lg">
 			<a href="{% url 'linear_regression:result' %}" style="color:#fff;"> Get Results </a>
 		</button>
 		{% endif %}
 
-		{% block no_file %}
-		{% endblock %}
 </div>
-
-
 {% endblock %}
+
+
 
 
